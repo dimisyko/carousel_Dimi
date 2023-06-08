@@ -33,8 +33,8 @@ class carousel {
     }
     #move(e) {
         if (!this.state) return
-        const movve = this.#params.mouseDown - (e.clientX ?? e.touches[0].clientX)
-        const lastDrag = this.#params.endDrag + movve
+        const move = this.#params.mouseDown - (e.clientX ?? e.touches[0].clientX)
+        const lastDrag = this.#params.endDrag + move
         this.#params.index = Math.round(lastDrag / this.widthEl)
 
         if (this.#params.index <= 0) {

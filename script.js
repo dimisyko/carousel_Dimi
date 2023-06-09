@@ -1,35 +1,34 @@
 class carousel {
-    #slider
-    #elements
-    #indicator
     #params = {
         mouseDown: 0,
         dragX: 0,
         endDrag: 0,
         index: 0
     }
-    constructor({ slider, elements, indicator }) {
-        this.#slider = slider
-        this.#elements = elements
-        this.#indicator = indicator
+    constructor({ slider, elements, indicator, btnNext, btnPrev }) {
+        this.slider = slider
+        this.elements = elements
+        this.indicator = indicator
+        this.btnNext = btnNext
+        this.btnPrev = btnPrev
         this.state = false
         this.#onLoad()
     }
     get length() {
-        return this.#elements.length - 1
+        return this.elements.length - 1
     }
     get widthEl() {
-        return this.#slider.firstElementChild.offsetWidth + parseFloat(getComputedStyle(this.#slider.firstElementChild).getPropertyValue('margin-right'))
+        return this.slider.firstElementChild.offsetWidth + parseFloat(getComputedStyle(this.slider.firstElementChild).getPropertyValue('margin-right'))
     }
     #onLoad() {
-        this.#indicator.textContent = `${this.#params.index + 1} / ${this.#elements.length}`
+        this.indicator.textContent = `${this.#params.index + 1} / ${this.elements.length}`
         this.#event()
     }
     #drag(e) {
         e.cancelable && e.preventDefault()
         this.state = true
         this.#params.mouseDown = e.clientX ?? e.touches[0].clientX
-        this.#slider.style.transition = "none"
+        this.slider.style.transition = "none"
     }
     #move(e) {
         if (!this.state) return
@@ -45,29 +44,47 @@ class carousel {
 
         const clamp = Math.max(0, Math.min(lastDrag, (this.widthEl * this.length)))
 
-        this.#slider.style.transform = "translateX(" + (clamp * -1) + "px)"
+        this.slider.style.transform = "translate3d(" + (clamp * -1) + "px, 0, 0)"
 
-        this.#indicator.textContent = `${this.#params.index + 1} / ${this.#elements.length}`
+        this.indicator.textContent = `${this.#params.index + 1} / ${this.elements.length}`
     }
     #mouseUp() {
         this.state = false
-
-        this.#slider.style.transform = "translateX(-" + this.#elements[this.#params.index].offsetLeft + "px)"
-        this.#slider.style.transition = "0.5s"
-
-        this.#params.endDrag = this.#elements[this.#params.index].offsetLeft
+        this.#animation()
+    }
+    #increment(index){
+        index
+        this.#animation()
+        this.indicator.textContent = `${this.#params.index + 1} / ${this.elements.length}`
+    }
+    #animation(){
+        this.slider.style.transform = "translate3d(-" + this.elements[this.#params.index].offsetLeft + "px, 0, 0)"
+        this.slider.style.transition = "0.5s"
+        this.#params.endDrag = this.elements[this.#params.index].offsetLeft
+    }
+    #next(){
+        if(this.#params.index == this.length) return
+        this.#increment(this.#params.index++)
+    }
+    #prev(){
+        if(this.#params.index == 0) return
+        this.#increment(this.#params.index--)
     }
     #event() {
-        this.#slider.addEventListener('mousedown', this.#drag.bind(this))
+        this.slider.addEventListener('mousedown', this.#drag.bind(this))
         document.addEventListener('mousemove', this.#move.bind(this))
-        this.#slider.addEventListener('mouseup', this.#mouseUp.bind(this))
-        this.#slider.addEventListener('touchstart', this.#drag.bind(this))
+        this.slider.addEventListener('mouseup', this.#mouseUp.bind(this))
+        this.slider.addEventListener('touchstart', this.#drag.bind(this))
         document.addEventListener('touchmove', this.#move.bind(this))
-        this.#slider.addEventListener('touchend', this.#mouseUp.bind(this))
+        this.slider.addEventListener('touchend', this.#mouseUp.bind(this))
+        this.btnNext.addEventListener('click', this.#next.bind(this))
+        this.btnPrev.addEventListener('click', this.#prev.bind(this))
     }
 }
 new carousel({
     slider: document.querySelector('.slide'),
     elements: document.querySelectorAll('.element'),
-    indicator: document.querySelector('.nbr')
+    indicator: document.querySelector('.nbr'),
+    btnNext : document.querySelector('.next'),
+    btnPrev : document.querySelector('.prev')
 })

@@ -23,7 +23,17 @@ body {
 
 }
 
-
 .element:nth-child(even) {
     background-color: red;
+}
+.indicator {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin: 3rem auto 0 auto;
+}
+.btn{
+    width: 7rem;
+    display: flex;
+    justify-content: space-between;
 }
